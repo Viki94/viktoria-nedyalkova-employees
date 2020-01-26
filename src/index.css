@@ -1,0 +1,40 @@
+input[type="file"] {
+  display: none;
+}
+
+.uploadFile {
+  display: inline-block;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  border: 1px solid #ccc;
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.employeeWrapper {
+  width: 100%;
+}
+
+.border,
+.dataTitle,
+.employeeTitle,
+.employeeData {
+  border: 1px solid black;
+  text-align: center;
+}
+
+.border {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.employeeTitle,
+.employeeData {
+  width: 20%;
+}
+
+.employeeTitle {
+  background-color: #5c5c5c;
+  color: #fff;
+}

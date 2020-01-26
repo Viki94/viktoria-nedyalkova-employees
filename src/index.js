@@ -9,12 +9,12 @@ class Employee extends React.Component {
         super(props);
         this.state = {
             employeeData: [],
-            maxDaysTwoPeopleAreWorkingTogetherOnSameProject: {
+            maxDaysOnSameProject: [{
                 firstEmployeeId: 0,
                 secondEmployeeId: 0,
                 projectId: 0,
                 maxDays: 0
-            }
+            }]
         };
 
         this.handleFileSelect = this.handleFileSelect.bind(this);
@@ -24,12 +24,6 @@ class Employee extends React.Component {
     setEmployeeDataInState(properties) {
         this.setState({
             employeeData: properties
-        });
-    }
-
-    maxDaysTwoPeopleAreWorkingTogetherOnSameProject(maxDays) {
-        this.setState({
-            maxDaysTwoPeopleAreWorkingTogetherOnSameProject: maxDays
         });
     }
 
@@ -65,8 +59,7 @@ class Employee extends React.Component {
     setStateWithPeopleWhoWorkedMostDays(minDateRange, maxDateRange, firstEmployee, secondEmployee) {
         const differenceBetweenTwoDates = maxDateRange.getTime() - minDateRange.getTime();
         const differenceInDaysBetweenTwoDates = differenceBetweenTwoDates / (1000 * 3600 * 24);
-
-        if (this.state.maxDaysTwoPeopleAreWorkingTogetherOnSameProject.maxDays < differenceInDaysBetweenTwoDates) {
+        if(this.state.maxDaysOnSameProject.map((x) => x.maxDays <= differenceInDaysBetweenTwoDates)) {
             const infoForEmployee = {
                 firstEmployeeId: firstEmployee.empId,
                 secondEmployeeId: secondEmployee.empId,
@@ -74,7 +67,7 @@ class Employee extends React.Component {
                 maxDays: differenceInDaysBetweenTwoDates,
             }
 
-            this.maxDaysTwoPeopleAreWorkingTogetherOnSameProject(infoForEmployee);
+            this.state.maxDaysOnSameProject.push(infoForEmployee);
         }
     }
 
@@ -116,7 +109,21 @@ class Employee extends React.Component {
                     this.getMinAndMaxDateRange(allEmployees[i], allEmployees[j])
                 }
             };
-        };
+        }
+
+        let largestMaxDays = 0;
+        this.state.maxDaysOnSameProject.forEach(element => {
+            if(largestMaxDays < element.maxDays) {
+                largestMaxDays = element.maxDays;
+            }
+        });
+        
+        for (let index = 0; index < this.state.maxDaysOnSameProject.length; index++) {
+            if (this.state.maxDaysOnSameProject[index].maxDays < largestMaxDays) {
+                this.state.maxDaysOnSameProject.splice(index, 1)
+                index = -1;
+            }
+        }
     }
 
     handleFileSelect(evt) {
@@ -141,34 +148,57 @@ class Employee extends React.Component {
 
     render() {
         const employeeData = this.state.employeeData;
-        const maxDaysTwoPeopleAreWorkingTogetherOnSameProject = this.state.maxDaysTwoPeopleAreWorkingTogetherOnSameProject;
-
+        const maxDaysOnSameProject = this.state.maxDaysOnSameProject;
         return (
             <div>
             <label class="uploadFile">
                 <input type="file" onChange={this.handleFileSelect}/>
                  Upload file
             </label>
-            {employeeData.length? (
+            {employeeData.length ? (
                 <div className="employeeWrapper">
                 <table className="border">
                     <thead>
                     <tr className="dataTitle">
-                        <th className="employeeTitle">First employee id</th>
-                        <th className="employeeTitle">Second employee id</th>
-                        <th className="employeeTitle">Project id</th>
+                        <th className="employeeTitle">Employee ID #1</th>
+                        <th className="employeeTitle">Employee ID #2</th>
+                        <th className="employeeTitle">Project ID</th>
                         <th className="employeeTitle">Days worked</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td className="employeeData">{maxDaysTwoPeopleAreWorkingTogetherOnSameProject.firstEmployeeId}</td>
-                        <td className="employeeData">{maxDaysTwoPeopleAreWorkingTogetherOnSameProject.secondEmployeeId}</td>
-                        <td className="employeeData">{maxDaysTwoPeopleAreWorkingTogetherOnSameProject.projectId}</td>
-                        <td className="employeeData">{maxDaysTwoPeopleAreWorkingTogetherOnSameProject.maxDays}</td>
+                    {maxDaysOnSameProject.map(employee => (
+                    <tr key= {employee.firstEmployeeId + employee.secondEmployeeId + employee.projectId}>
+                        <td className="employeeData">{employee.firstEmployeeId}</td>
+                        <td className="employeeData">{employee.secondEmployeeId}</td>
+                        <td className="employeeData">{employee.projectId}</td>
+                        <td className="employeeData">{employee.maxDays}</td>
                     </tr>
+                    ))}
                     </tbody>
                 </table>
+
+                <table className="border">
+                    <thead>
+                        <tr className="dataTitle">
+                            <th className="employeeTitle">Employee id</th>
+                            <th className="employeeTitle">Project id</th>
+                            <th className="employeeTitle">Date from</th>
+                            <th className="employeeTitle">Date to</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {employeeData.map(function(employee) {
+                            return <tr key= {employee.empId + employee.projectId}>
+                                <td className="employeeData emplId">{employee.empId}</td>
+                                <td className="employeeData projectId">{employee.projectId}</td>
+                                <td className="employeeData dateFrom">{employee.dateFrom}</td>
+                                <td className="employeeData dateTo">{employee.dateTo}</td>
+                            </tr>;
+                    })}
+                    </tbody>
+                </table>
+
             </div>) :null}
             </div>
         );
